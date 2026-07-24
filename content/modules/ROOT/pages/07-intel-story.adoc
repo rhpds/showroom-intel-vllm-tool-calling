@@ -1,0 +1,83 @@
+= Module 7: The Intel Xeon Story
+
+_Estimated time: 5 minutes_
+
+In this module you will understand why CPU-based inference is well-suited to tool calling workloads, check the Intel hardware powering your cluster, and see how {intel_platform} processors deliver the right economics for agentic AI.
+
+== Why CPU Inference Fits Tool Calling
+
+Tool calling has a distinctive performance profile that differs from long-form text generation. The model produces a short structured response (the tool call JSON), *waits* for the tool to execute, then produces another short response. This stop-and-go pattern plays to CPU strengths:
+
+* *Short output sequences* -- Tool call responses are typically 50-200 tokens of JSON, not pages of text
+* *I/O-bound latency* -- The bottleneck is the external tool (API call, database query), not inference speed
+* *Lower concurrency* -- Agentic workflows are per-user, not batch processing thousands of prompts
+* *No additional hardware cost* -- You run inference on {intel_platform} servers already in your data center
+
+The model is idle while tools execute. GPU utilization during that idle time is wasted. CPUs handle this intermittent pattern efficiently.
+
+== Check the Cluster Hardware
+
+Examine the nodes powering your cluster:
+
+[source,bash,role="execute",subs="attributes+"]
+----
+oc get nodes -o custom-columns=NAME:.metadata.name,CPU:.status.capacity.cpu,MEMORY:.status.capacity.memory
+----
+
+Depending on the {intel_platform} generation in your cluster, the vLLM runtime may leverage:
+
+* *AVX-512* -- Advanced Vector Extensions that accelerate matrix operations (3rd Gen Intel Xeon Scalable and later)
+* *AMX (Advanced Matrix Extensions)* -- Hardware acceleration for INT8 and BF16 matrix multiply (4th Gen Intel Xeon Scalable and later)
+* *VNNI (Vector Neural Network Instructions)* -- Optimized instructions for inference workloads
+
+These extensions narrow the performance gap with GPU, particularly for smaller models and the short-output patterns that define tool calling.
+
+== Check Resource Usage
+
+See how much CPU and memory the model server consumes:
+
+[source,bash,role="execute",subs="attributes+"]
+----
+oc adm top pods -n {project_name}
+----
+
+Tool calling models on CPU typically show moderate, intermittent resource usage. The model is active only during the generate phases -- between tool calls, it is idle.
+
+== The Economics
+
+Consider deploying an agentic assistant that calls three tools per user query:
+
+* *GPU path:* Procure GPU hardware, set up GPU operator, configure node affinity, manage drivers. Timeline: weeks to months. Cost: thousands per month per GPU.
+* *CPU path:* Deploy on existing {intel_platform} infrastructure. Same OpenShift cluster running your other workloads. Timeline: the `oc apply -k` command you ran in Module 2. Additional hardware cost: zero.
+
+For tool calling workloads where the model produces short outputs and waits for external services between turns, CPU inference delivers the same functionality at a fraction of the cost.
+
+== When CPU Works for AI
+
+[cols="1,2"]
+|===
+| Workload | Why CPU Works
+
+| *Agentic assistants*
+| Short outputs, tool wait times dominate total latency
+
+| *API orchestration*
+| Model routes requests to the right API; output is structured JSON
+
+| *Data retrieval agents*
+| Model queries databases and summarizes results; I/O is the bottleneck
+
+| *Small to medium models (up to 14B)*
+| Fit in system memory with acceptable inference speed on {intel_platform}
+|===
+
+== Checkpoint
+
+At this point you have:
+
+* [x] Understood why tool calling's stop-and-go pattern suits CPU inference
+* [x] Checked the node hardware and Intel-specific optimizations available
+* [x] Reviewed real resource usage of the model server
+* [x] Understood the cost comparison between CPU and GPU deployment
+
+Proceed to xref:08-conclusion.adoc[Module 8: Conclusion] to wrap up the lab.

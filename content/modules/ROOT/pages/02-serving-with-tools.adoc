@@ -1,0 +1,173 @@
+= Module 2: Serve a Model with Tool Calling
+
+_Estimated time: 15 minutes_
+
+In this module you will access the OpenShift cluster, examine the critical vLLM flags that enable tool calling, deploy the model server, and verify it is ready. You will understand *how* the serving layer enables tool calling before you use it.
+
+== Access the Cluster
+
+Open the OpenShift Console using the link in the right panel, or navigate to:
+
+{openshift_console_url}
+
+Log in with:
+
+* *Username:* `{user}`
+* *Password:* `{password}`
+
+In the terminal panel, log in via the CLI:
+
+[source,bash,role="execute",subs="attributes+"]
+----
+oc login -u {user} -p {password} {openshift_api_url}
+----
+
+Verify your project exists:
+
+[source,bash,role="execute",subs="attributes+"]
+----
+oc project {project_name}
+----
+
+== Set Up Environment Variables
+
+Set the variables that the remaining modules will use:
+
+[source,bash,role="execute",subs="attributes+"]
+----
+export PROJECT={project_name}
+export MAAS_URL={maas_api_url}
+export MAAS_MODEL={maas_model}
+echo "Project: $\{PROJECT\}"
+echo "MaaS URL: $\{MAAS_URL\}"
+echo "MaaS Model: $\{MAAS_MODEL\}"
+----
+
+Install the Python OpenAI client library (you will need it in later modules):
+
+[source,bash,role="execute"]
+----
+pip install --quiet openai
+----
+
+== Clone the Quickstart Repository
+
+Clone the repository that contains the Kustomize overlays:
+
+[source,bash,role="execute",subs="attributes+"]
+----
+cd ~ && git clone {quickstart_repo}
+----
+
+Examine the overlay structure:
+
+[source,bash,role="execute"]
+----
+ls ~/vllm-tool-calling/
+----
+
+Each model has its own directory with device-specific overlays (CPU or GPU). The overlays configure the model name, resource limits, and the flags that activate tool calling.
+
+== Understand the Tool Calling Flags
+
+Before you deploy, examine the critical vLLM arguments that enable tool calling. These are set in the Kustomize overlay and passed to the vLLM server at startup:
+
+[cols="2,3"]
+|===
+| Flag | Purpose
+
+| `--enable-auto-tool-choice`
+| Lets the model autonomously decide when to call a tool versus responding with text. Without this flag, the model ignores tool definitions entirely.
+
+| `--tool-call-parser granite`
+| Tells vLLM how to parse the model's tool call output. Different model families format tool calls differently. Granite uses a specific token format; Llama uses `llama3_json`.
+
+| `--chat-template`
+| Points to a Jinja2 template that formats tool definitions for the model. The template wraps tools in role markers like `<\|start_of_role\|>available_tools<\|end_of_role\|>` so the model recognizes them.
+|===
+
+The key insight: *tool calling is a model capability enabled by the serving layer*. The model must be trained for tool calling, and the server must be configured to parse its output format. Neither alone is sufficient.
+
+== Deploy the Model
+
+You have two options: deploy Granite 3.2-8B on-cluster, or connect to a pre-hosted model via MaaS.
+
+=== Option A: Deploy Granite 3.2-8B On-Cluster
+
+Apply the Kustomize overlay for Granite 3.2-8B on CPU:
+
+[source,bash,role="execute",subs="attributes+"]
+----
+oc apply -n {project_name} -k ~/vllm-tool-calling/granite-3.2-8b/cpu
+----
+
+Monitor until the pod is running:
+
+[source,bash,role="execute",subs="attributes+"]
+----
+oc get pods -n {project_name} -w
+----
+
+Press `Ctrl+C` once the vLLM pod reaches `Running` status. The model download may take 3-5 minutes.
+
+Set the model endpoint:
+
+[source,bash,role="execute",subs="attributes+"]
+----
+export MODEL_URL=$(oc get route vllm-tool-calling -n {project_name} -o jsonpath='https://\{.spec.host\}/v1')
+export MODEL_NAME="granite-3.2-8b"
+echo "Model URL: $\{MODEL_URL\}"
+----
+
+=== Option B: Use Model as a Service (MaaS)
+
+If you prefer to skip on-cluster deployment, use the pre-hosted endpoint:
+
+[source,bash,role="execute",subs="attributes+"]
+----
+export MODEL_URL={maas_api_url}
+export MODEL_NAME={maas_model}
+echo "Model URL: $\{MODEL_URL\}"
+echo "Model Name: $\{MODEL_NAME\}"
+----
+
+The MaaS endpoint serves {maas_model} with tool calling support. No deployment needed.
+
+== Verify the Model
+
+List available models:
+
+[source,bash,role="execute"]
+----
+curl -s $\{MODEL_URL\}/models | python3 -m json.tool
+----
+
+You should see your model listed in the JSON response.
+
+Send a basic chat completion (no tools) to confirm the model is healthy:
+
+[source,bash,role="execute"]
+----
+curl -s $\{MODEL_URL\}/chat/completions \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "'"$\{MODEL_NAME\}"'",
+    "messages": [
+      {"role": "user", "content": "What is function calling in AI? Answer in two sentences."}
+    ],
+    "max_tokens": 150
+  }' | python3 -m json.tool
+----
+
+You should receive a natural language response. This confirms the endpoint is healthy and ready for tool calling in the next module.
+
+== Checkpoint
+
+At this point you have:
+
+* [x] Logged into the OpenShift cluster and set up environment variables
+* [x] Understood the three critical vLLM flags that enable tool calling
+* [x] Deployed the model server (on-cluster or MaaS)
+* [x] Verified the model is responding to basic requests
+
+Proceed to xref:03-anatomy-of-tool-call.adoc[Module 3: Anatomy of a Tool Call].
