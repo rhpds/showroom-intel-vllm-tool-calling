@@ -1,0 +1,75 @@
+= Module 1: Accessing the Cluster
+
+_Estimated time: 5 minutes_
+
+In this module you will log into the OpenShift cluster, verify the lab environment, and set up environment variables used throughout the lab.
+
+== Log into OpenShift
+
+Open the OpenShift Console using the link in the right panel, or navigate to:
+
+{openshift_console_url}
+
+Log in with:
+
+* *Username:* `{user}`
+* *Password:* `{password}`
+
+== Verify from the Terminal
+
+In the terminal panel on the right, log in via the CLI:
+
+[source,bash,role="execute",subs="attributes+"]
+----
+oc login -u {user} -p {password} {openshift_api_url}
+----
+
+Verify your project exists:
+
+[source,bash,role="execute",subs="attributes+"]
+----
+oc project {project_name}
+----
+
+Check that the namespace is ready:
+
+[source,bash,role="execute",subs="attributes+"]
+----
+oc get pods -n {project_name}
+----
+
+The namespace may be empty at this point -- that is expected. You will deploy the model server in the next module.
+
+== Set Up Environment Variables
+
+Set the environment variables that the remaining modules will use. These will persist for the duration of your terminal session:
+
+[source,bash,role="execute",subs="attributes+"]
+----
+export PROJECT={project_name}
+export MAAS_URL={maas_api_url}
+export MAAS_MODEL={maas_model}
+echo "Project: $\{PROJECT\}"
+echo "MaaS URL: $\{MAAS_URL\}"
+echo "MaaS Model: $\{MAAS_MODEL\}"
+----
+
+== Install Python Dependencies
+
+You will write Python scripts later in the lab. Install the `openai` client library now:
+
+[source,bash,role="execute"]
+----
+pip install --quiet openai
+----
+
+== Checkpoint
+
+At this point you have:
+
+* [x] Logged into the OpenShift console and CLI
+* [x] Verified the project namespace exists
+* [x] Set up environment variables for later modules
+* [x] Installed the Python OpenAI client library
+
+Proceed to xref:02-deploy-vllm.adoc[Module 2: Deploy vLLM with Tool Calling].

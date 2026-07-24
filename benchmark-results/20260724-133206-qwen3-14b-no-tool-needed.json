@@ -1,0 +1,18 @@
+{
+  "success": true,
+  "latency": 3.9,
+  "content": "\n\nThe capital of France is Paris.",
+  "prompt_tokens": 53,
+  "completion_tokens": 133,
+  "tool_calls": [],
+  "label": "no-tool-needed",
+  "keyword_score": 1.0,
+  "keywords_found": [
+    "Paris"
+  ],
+  "keywords_expected": [
+    "Paris"
+  ],
+  "accuracy_check": true,
+  "expected_answer": "Paris"
+}

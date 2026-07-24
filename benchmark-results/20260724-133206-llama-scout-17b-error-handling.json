@@ -1,0 +1,20 @@
+{
+  "success": false,
+  "latency": 5.0,
+  "content": "<urlopen error [Errno 8] nodename nor servname provided, or not known>",
+  "prompt_tokens": 0,
+  "completion_tokens": 0,
+  "tool_calls": [],
+  "label": "error-handling",
+  "keyword_score": 0.0,
+  "keywords_found": [],
+  "keywords_expected": [
+    "retry",
+    "wait",
+    60,
+    "seconds",
+    "apologize"
+  ],
+  "accuracy_check": null,
+  "expected_answer": ""
+}

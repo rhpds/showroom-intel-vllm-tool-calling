@@ -1,0 +1,19 @@
+{
+  "success": false,
+  "latency": 5.01,
+  "content": "<urlopen error [Errno 8] nodename nor servname provided, or not known>",
+  "prompt_tokens": 0,
+  "completion_tokens": 0,
+  "tool_calls": [],
+  "label": "tool-understanding",
+  "keyword_score": 0.0,
+  "keywords_found": [],
+  "keywords_expected": [
+    "get_employee_info",
+    12345,
+    "call",
+    "tool"
+  ],
+  "accuracy_check": null,
+  "expected_answer": ""
+}

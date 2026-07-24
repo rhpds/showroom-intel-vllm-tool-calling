@@ -1,0 +1,21 @@
+= Enable AI Tool Calling on OpenShift -- Lab
+
+This repository contains a guided, hands-on lab for the https://github.com/rh-ai-quickstart/vllm-tool-calling[vllm-tool-calling] quickstart.
+
+== Running locally
+
+[source,bash]
+----
+npx antora default-site.yml
+open www/index.html
+----
+
+== Structure
+
+* `content/` -- Antora lab content (AsciiDoc pages, images)
+* `content/supplemental-ui/` -- Showroom UI extensions (send-to-terminal, branding)
+
+== Related
+
+* https://github.com/rh-ai-quickstart/vllm-tool-calling[Quickstart Repository]
+* https://docs.redhat.com/en/learn/ai-quickstarts[AI Quickstart Catalog]

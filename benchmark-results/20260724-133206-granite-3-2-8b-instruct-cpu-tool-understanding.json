@@ -1,0 +1,24 @@
+{
+  "success": true,
+  "latency": 3.67,
+  "content": "I would call the get_employee_info tool with the parameter employee_id set to 12345 to retrieve the relevant information about that employee.",
+  "prompt_tokens": 87,
+  "completion_tokens": 34,
+  "tool_calls": [],
+  "label": "tool-understanding",
+  "keyword_score": 1.0,
+  "keywords_found": [
+    "get_employee_info",
+    12345,
+    "call",
+    "tool"
+  ],
+  "keywords_expected": [
+    "get_employee_info",
+    12345,
+    "call",
+    "tool"
+  ],
+  "accuracy_check": null,
+  "expected_answer": ""
+}

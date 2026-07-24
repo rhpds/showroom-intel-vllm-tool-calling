@@ -1,0 +1,23 @@
+{
+  "success": true,
+  "latency": 4.36,
+  "content": "\"I'm sorry for the inconvenience, but it seems the weather API has temporarily exceeded its rate limit. Please try again in about 60 seconds. I appreciate your patience.\"",
+  "prompt_tokens": 81,
+  "completion_tokens": 39,
+  "tool_calls": [],
+  "label": "error-handling",
+  "keyword_score": 0.4,
+  "keywords_found": [
+    60,
+    "seconds"
+  ],
+  "keywords_expected": [
+    "retry",
+    "wait",
+    60,
+    "seconds",
+    "apologize"
+  ],
+  "accuracy_check": null,
+  "expected_answer": ""
+}

@@ -1,0 +1,19 @@
+{
+  "success": false,
+  "latency": 5.0,
+  "content": "<urlopen error [Errno 8] nodename nor servname provided, or not known>",
+  "prompt_tokens": 0,
+  "completion_tokens": 0,
+  "tool_calls": [],
+  "label": "multi-step-reasoning",
+  "keyword_score": 0.0,
+  "keywords_found": [],
+  "keywords_expected": [
+    "check_room_availability",
+    "book_room",
+    "send_invites",
+    "sequence"
+  ],
+  "accuracy_check": null,
+  "expected_answer": ""
+}

@@ -1,0 +1,24 @@
+{
+  "success": true,
+  "latency": 3.26,
+  "content": "The tool call would be:\n\nsearch_database(query=\"kubernetes security\", limit=5, sort_by=\"date\")",
+  "prompt_tokens": 109,
+  "completion_tokens": 28,
+  "tool_calls": [],
+  "label": "tool-parameter-extraction",
+  "keyword_score": 1.0,
+  "keywords_found": [
+    "search_database",
+    "kubernetes security",
+    5,
+    "date"
+  ],
+  "keywords_expected": [
+    "search_database",
+    "kubernetes security",
+    5,
+    "date"
+  ],
+  "accuracy_check": null,
+  "expected_answer": ""
+}

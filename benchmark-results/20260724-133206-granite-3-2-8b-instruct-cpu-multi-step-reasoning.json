@@ -1,0 +1,23 @@
+{
+  "success": true,
+  "latency": 27.77,
+  "content": "1. Call `check_room_availability` with parameters for tomorrow's date and time (2pm), and the required capacity (5 people). This tool will return information about the availability of meeting rooms during the specified time.\n\n2. Based on the response from `check_room_availability`, select a suitable room. If no rooms are available, notify the user about the unavailability and end the process.\n\n3. Once a suitable room is found, call `book_room` with parameters including the selected room, date (tomorrow), start time (2pm), and duration (typically 1 hour for a meeting). This tool will confirm the booking and return a booking ID or confirmation.\n\n4. After successfully booking the room, call `send_invites` with parameters including the meeting room details (obtained from the `book_room` response), the date and time, and the list of attendees (5 people). This tool will send out calendar invites or meeting room booking confirmations to the specified attendees.\n\n5. Finally, return a confirmation message to the user that the meeting room has been successfully booked for tomorrow at 2pm, and invites have been sent to all attendees",
+  "prompt_tokens": 100,
+  "completion_tokens": 256,
+  "tool_calls": [],
+  "label": "multi-step-reasoning",
+  "keyword_score": 0.75,
+  "keywords_found": [
+    "check_room_availability",
+    "book_room",
+    "send_invites"
+  ],
+  "keywords_expected": [
+    "check_room_availability",
+    "book_room",
+    "send_invites",
+    "sequence"
+  ],
+  "accuracy_check": null,
+  "expected_answer": ""
+}

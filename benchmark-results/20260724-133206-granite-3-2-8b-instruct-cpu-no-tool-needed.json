@@ -1,0 +1,16 @@
+{
+  "success": true,
+  "latency": 0.98,
+  "content": "<tool_call>[]",
+  "prompt_tokens": 56,
+  "completion_tokens": 6,
+  "tool_calls": [],
+  "label": "no-tool-needed",
+  "keyword_score": 0.0,
+  "keywords_found": [],
+  "keywords_expected": [
+    "Paris"
+  ],
+  "accuracy_check": false,
+  "expected_answer": "Paris"
+}

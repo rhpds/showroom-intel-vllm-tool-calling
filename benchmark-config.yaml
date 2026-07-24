@@ -1,0 +1,55 @@
+# Benchmark config for vllm-tool-calling showroom
+# NOTE: This quickstart tests function/tool calling capability.
+# The benchmark script's standard chat flow tests quality, but we also
+# need to verify tool calling works — that's done in the full benchmark harness.
+
+quickstart: vllm-tool-calling
+use_case: LLM with function/tool calling for agentic AI applications
+max_tokens: 256
+
+system_prompt: >
+  You are a helpful assistant with access to tools. When a user asks
+  for information you can retrieve via a tool, call the appropriate
+  tool rather than guessing the answer.
+
+models:
+  - id: qwen3-14b
+    endpoint: https://qwen3-14b-direct-llm-hosting.apps.ocp-rac-maas.rs-dfw3.infra.demo.redhat.com/v1
+  - id: granite-3-2-8b-instruct-cpu
+    endpoint: https://granite-3-2-8b-instruct-external-llm-hosting.apps.ocp-rac-maas.rs-dfw3.infra.demo.redhat.com/v1
+  - id: llama-scout-17b
+    endpoint: http://llama-scout-17b-predictor.llm-hosting.svc.cluster.local:8080/v1
+
+test_prompts:
+  - label: tool-understanding
+    prompt: >
+      I have a tool called get_employee_info that takes an employee_id parameter.
+      If I ask you to look up employee 12345, what would you do?
+    expected_keywords: [get_employee_info, 12345, call, tool]
+
+  - label: multi-step-reasoning
+    prompt: >
+      A user asks: "Book a meeting room for tomorrow at 2pm for 5 people."
+      If you had tools for check_room_availability, book_room, and send_invites,
+      describe the sequence of tool calls you would make.
+    expected_keywords: [check_room_availability, book_room, send_invites, sequence]
+
+  - label: tool-parameter-extraction
+    prompt: >
+      Given a tool called search_database with parameters: query (string),
+      limit (integer, default 10), and sort_by (string, one of: relevance,
+      date, title), what tool call would you make for: "Find the 5 most
+      recent documents about kubernetes security"?
+    expected_keywords: [search_database, kubernetes security, 5, date]
+
+  - label: no-tool-needed
+    prompt: >
+      What is the capital of France?
+    expected_answer: "Paris"
+    expected_keywords: [Paris]
+
+  - label: error-handling
+    prompt: >
+      A tool call to get_weather returned an error: "API rate limit exceeded,
+      retry after 60 seconds." How should you respond to the user?
+    expected_keywords: [retry, wait, 60, seconds, apologize]

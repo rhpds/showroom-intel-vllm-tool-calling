@@ -1,0 +1,70 @@
+= Enable AI Tool Calling on OpenShift
+
+Welcome to the *vLLM Tool Calling on OpenShift AI* lab. In this hands-on workshop you will deploy a model that supports function calling, learn the OpenAI-compatible tools API, and build applications that let an LLM invoke external tools -- all running on {intel_platform} processors.
+
+== What Is Tool Calling?
+
+Tool calling (also called function calling) is the ability for a large language model to request the execution of external functions during a conversation. Instead of guessing at answers, the model can:
+
+* *Call a weather API* to get today's forecast
+* *Query a database* to look up employee records
+* *Check inventory* in a warehouse management system
+* *Run calculations* that require precision beyond what a language model provides
+
+The model does not execute the functions itself. It produces a structured JSON request describing which function to call and with what arguments. Your application executes the function and returns the result to the model, which then incorporates it into a natural language answer.
+
+== Why Tool Calling Matters for Agentic AI
+
+Tool calling is the foundation of agentic AI patterns. An agent is an LLM that can take actions -- and those actions are tools. Without tool calling, a model can only generate text. With it, a model becomes an interface to your entire software ecosystem.
+
+This lab teaches the mechanics: how to define tools, send them to a model, parse tool call responses, execute functions, and return results. These are the building blocks for any agent framework.
+
+== Architecture
+
+This quickstart deploys a single component -- the vLLM model server with tool calling enabled. There is no application UI. You interact with the model entirely through API calls using `curl` and Python.
+
+[cols="1,3"]
+|===
+| Component | Purpose
+
+| *vLLM with Tool Calling*
+| Serves a tool-calling-capable model (Granite 3.2-8B on-cluster, or Qwen3-14B via MaaS) with the `--enable-auto-tool-choice` flag. Exposes an OpenAI-compatible `/v1/chat/completions` endpoint.
+
+| *OpenShift AI*
+| Provides the serving runtime, resource management, and networking.
+
+| *Your Terminal*
+| Where you build and run `curl` commands and Python scripts that interact with the model API.
+|===
+
+== Prerequisites
+
+* An OpenShift cluster provisioned through RHDP (Red Hat Demo Platform)
+* A modern web browser
+* Terminal access (provided in the right panel)
+
+== Time Estimate
+
+This lab takes approximately *75 minutes* to complete:
+
+[cols="1,2,1"]
+|===
+| Module | Topic | Time
+
+| 1 | Accessing the Cluster | 5 min
+| 2 | Deploy vLLM with Tool Calling | 15 min
+| 3 | Your First Tool Call | 20 min
+| 4 | Build a Tool-Calling Application | 15 min
+| 5 | Advanced Tool Calling Patterns | 10 min
+| 6 | The Intel Xeon Story | 5 min
+| 7 | Conclusion | 5 min
+|===
+
+[NOTE]
+====
+This lab is entirely hands-on via the terminal. There is no application UI to click through -- you will write API calls and Python code. Each module builds on the previous one, so work through them in order.
+====
+
+== Ready?
+
+When you are ready, proceed to xref:01-accessing-cluster.adoc[Module 1: Accessing the Cluster] to log into your OpenShift environment.

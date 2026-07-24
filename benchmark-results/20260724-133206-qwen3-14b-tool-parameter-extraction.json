@@ -1,0 +1,24 @@
+{
+  "success": true,
+  "latency": 7.16,
+  "content": "\n\n{\n  \"tool\": \"search_database\",\n  \"parameters\": {\n    \"query\": \"kubernetes security\",\n    \"limit\": 5,\n    \"sort_by\": \"date\"\n  }\n}",
+  "prompt_tokens": 105,
+  "completion_tokens": 223,
+  "tool_calls": [],
+  "label": "tool-parameter-extraction",
+  "keyword_score": 1.0,
+  "keywords_found": [
+    "search_database",
+    "kubernetes security",
+    5,
+    "date"
+  ],
+  "keywords_expected": [
+    "search_database",
+    "kubernetes security",
+    5,
+    "date"
+  ],
+  "accuracy_check": null,
+  "expected_answer": ""
+}
