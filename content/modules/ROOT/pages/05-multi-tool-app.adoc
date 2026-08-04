@@ -4,6 +4,21 @@ _Estimated time: 15 minutes_
 
 In this module you will extend your tool calling application with a third tool, test queries that require multiple chained tool calls, implement error handling, and add logging to trace the model's reasoning. This is where tool calling becomes agentic -- the model plans a sequence of actions to answer a complex question.
 
+== Know: When Tool Calling Becomes Agentic
+
+A single tool call is useful. Multiple tool calls in sequence is where AI becomes _agentic_ -- the model is no longer just answering questions, it is planning and executing a series of actions to solve a problem.
+
+Consider the question: "What is the weather in the city where employee 12345 works?" No single tool can answer this. The model must:
+
+. Recognize that it needs the employee's location first
+. Call `lookup_employee` to get the office city
+. Use that city to call `get_weather`
+. Synthesize both results into a coherent answer
+
+The model was not programmed to do this sequence. It _infers_ the plan from the tool descriptions and the user's question. This emergent planning behavior is what separates tool calling from simple API integration -- and it is the foundation of every AI agent framework.
+
+In this module you will observe this planning behavior firsthand and learn to handle the edge cases that come with it: errors, unexpected tool calls, and the need for auditable traces.
+
 == Add a Third Tool
 
 Create an expanded application with three tools: weather, employee lookup, and inventory check. The interesting part is what happens when a question requires *more than one* tool call:
@@ -143,6 +158,22 @@ Watch Query 3 carefully. The model must:
 
 This chaining is *emergent behavior*. You did not program the sequence. The model figured out that it needs Alice's office location before it can check the weather. This is the beginning of agentic reasoning.
 
+=== Verify: Multi-Step Chaining
+
+For Query 3 ("What is the weather in the city where employee 12345 works?"), you should see two tool calls in sequence:
+
+----
+  Step 1: lookup_employee({"employee_id": 12345})
+         -> {"name": "Alice Johnson", "department": "Engineering", "title": "Staff Engineer", "office": "Boston"}
+
+  Step 2: get_weather({"location": "Boston"})
+         -> {"temp": 72, "unit": "F", "condition": "partly cloudy", "humidity": 65}
+
+A: The weather in Boston, where Alice Johnson works, is 72°F and partly cloudy...
+----
+
+If the model calls both tools in a single turn (parallel calls) instead of sequentially, that is also valid -- it means the model can handle parallel tool execution. If it only calls one tool and answers with incomplete information, the model may not support multi-step reasoning well.
+
 == Test Error Handling
 
 What happens when a tool returns an error? The model should handle it gracefully:
@@ -257,6 +288,25 @@ The trace log shows every tool call in sequence, with timestamps. In production,
 == Key Insight
 
 Multi-step tool calling is where agents begin. The model is not just answering questions -- it is *planning a sequence of actions*. "Find employee 12345, get their city, check the weather there" is a three-step plan the model executes through tool calls. Every agent framework builds on this exact pattern.
+
+=== Troubleshooting
+
+[cols="1,2",options="header"]
+|===
+|Symptom |Resolution
+
+|Query 3 only calls one tool
+|The model may not support multi-step reasoning. Try rephrasing: "First find where employee 12345 works, then check the weather there."
+
+|Error handling test returns a hallucinated inventory count
+|The model may be ignoring the error result. Check that the error is returned as structured JSON (`{"error": "..."}`) not as a Python exception string.
+
+|Trace logging shows no tool calls
+|The `tools` array may be empty or malformed. Print it with `print(json.dumps(tools, indent=2))` to verify.
+
+|`TypeError` on function dispatch
+|The model may be sending arguments with wrong types (e.g., string instead of integer for `employee_id`). Add type coercion in the dispatch: `int(fn_args.get("employee_id", 0))`.
+|===
 
 == Checkpoint
 

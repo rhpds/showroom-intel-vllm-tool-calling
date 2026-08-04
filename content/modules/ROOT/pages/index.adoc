@@ -2,6 +2,12 @@
 
 Welcome to the *vLLM Tool Calling on OpenShift AI* lab. In this hands-on workshop you will build a complete tool calling system -- from understanding the protocol, to deploying a model, to writing an automated multi-tool application. Everything runs on {intel_platform} processors.
 
+== The Scenario
+
+Your team is building an internal AI assistant for operations staff. The assistant must do more than chat -- it needs to look up employee records, check inventory systems, and query live data from external APIs. Today, staff switch between five different tools to answer one customer question. You are building an assistant that calls those tools automatically.
+
+The challenge: most tool calling tutorials assume expensive GPU hardware. In this lab you will prove that an {intel_platform} CPU can handle agentic AI workloads -- because tool calling's stop-and-go pattern (short model outputs, long tool execution waits) plays to CPU strengths, not GPU strengths.
+
 == What You Will BUILD
 
 By the end of this lab you will have constructed:

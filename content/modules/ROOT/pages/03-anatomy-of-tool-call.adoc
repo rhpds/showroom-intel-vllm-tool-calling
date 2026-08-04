@@ -4,6 +4,14 @@ _Estimated time: 20 minutes_
 
 In this module you will execute the complete 6-step tool calling protocol by hand using `curl`. You will define a tool, send it to the model, parse the response, execute a mock function, return the result, and get a final answer. Every step is manual so you understand exactly what happens at the protocol level.
 
+== Know: Why Execute the Protocol by Hand?
+
+In this module you will do something that seems tedious: execute the entire tool calling protocol manually, step by step, using `curl` commands. Every production system automates this with libraries like the OpenAI Python SDK. So why do it by hand?
+
+Because when tool calling breaks in production -- and it will -- you need to know exactly where in the protocol the failure happened. Was it the tool definition? The model's response format? The result parsing? The message history construction?
+
+Developers who learned tool calling through a framework often cannot debug it because they never saw the raw protocol. By the end of this module, you will be able to reconstruct the entire flow from memory. That understanding is permanent and framework-independent.
+
 == Step 1: Define a Tool
 
 A tool definition tells the model what functions are available, what they do, and what arguments they accept. Create a request file with a `get_weather` tool:
@@ -111,6 +119,18 @@ Three pieces of data come back from the model:
 
 The model parsed "Paris" from the user's question and structured it as a `location` argument. This is the core value of tool calling: *the model translates natural language into structured function calls*.
 
+=== Verify: Tool Call Parsed Correctly
+
+You should see output like:
+
+----
+Tool Call ID: call_abc123...
+Function: get_weather
+Arguments: {"location": "Paris"}
+----
+
+The function name should be `get_weather` and the arguments should contain `"location": "Paris"` (the model extracted this from the user's question). If you see an error about `tool_calls` being `None`, the model responded with text instead of a tool call -- this means the tool calling flags may not be configured correctly on the server (revisit Module 2).
+
 == Step 4: Execute the Tool
 
 In production, you would call an actual weather API here. For this lab, simulate the tool execution with mock data:
@@ -159,6 +179,16 @@ The model now generates a natural language response using the tool result. Inste
 
 This is the complete protocol. Six steps, executed manually, with full visibility into every piece of data flowing between your code and the model.
 
+=== Verify: Complete Protocol
+
+The final response should:
+
+* Contain natural language (not JSON or a tool call)
+* Reference the specific data from your mock tool result (22 degrees, sunny, 45% humidity)
+* NOT hallucinate additional weather details that were not in the tool result
+
+If the model ignores the tool result and makes up weather data, the `tool_call_id` in Step 5 may not match. The model uses this ID to link results to requests.
+
 == The Complete Message Flow
 
 Here is the sequence you just executed:
@@ -202,6 +232,31 @@ curl -s $\{MODEL_URL\}/chat/completions \
 ----
 
 The model should answer directly with "Paris" -- no tool call needed. With `tool_choice: "auto"`, the model decides when a tool is necessary. This is the intelligence in tool calling: the model knows the difference between "I need data" and "I already know the answer."
+
+=== Verify: Tool Choice Auto
+
+The response should contain a `message.content` field with text (not a `tool_calls` array). The model correctly determined that answering "What is the capital of France?" does not require checking the weather.
+
+If the model still calls `get_weather` for this question, the tool `description` may be too broad. A good description includes clear trigger conditions so the model knows when to use the tool and when to respond directly.
+
+=== Troubleshooting
+
+[cols="1,2",options="header"]
+|===
+|Symptom |Resolution
+
+|Model returns text instead of `tool_calls`
+|The `--enable-auto-tool-choice` flag may not be set on the vLLM server. Or the model may not support tool calling. Verify with Module 2's deployment.
+
+|JSON parsing error on `tool_response.json`
+|The curl command may have failed silently. Check the raw response: `cat ~/tool_response.json`. If it contains an HTML error page, the URL is wrong.
+
+|`sed` substitution does not replace MODEL_PLACEHOLDER
+|The `MODEL_NAME` environment variable may not be set. Run `echo $MODEL_NAME` to verify.
+
+|Final answer ignores the tool result
+|Ensure the `tool_call_id` in Step 5 matches exactly. Copy-paste errors in the ID cause the model to disregard the result.
+|===
 
 == Checkpoint
 

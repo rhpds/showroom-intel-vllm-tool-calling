@@ -4,6 +4,18 @@ _Estimated time: 15 minutes_
 
 In this module you will access the OpenShift cluster, examine the critical vLLM flags that enable tool calling, deploy the model server, and verify it is ready. You will understand *how* the serving layer enables tool calling before you use it.
 
+== Know: Why the Serving Layer Matters for Tool Calling
+
+Tool calling is not just a prompt engineering trick — it requires coordination between the model and the serving layer. Three things must align:
+
+* *Model training* — the model must have been trained on tool calling examples so it knows how to produce structured `tool_calls` JSON instead of plain text
+* *Server configuration* — the vLLM server must be told to parse tool call output from the model's specific format (Granite, Llama, and Hermes each format tool calls differently)
+* *Chat template* — a Jinja2 template wraps tool definitions in special tokens so the model recognizes them as available functions
+
+If any of these three pieces is missing, tool calling silently fails — the model responds with text instead of structured tool calls, and you have no error message to debug.
+
+This is why the three vLLM flags you will examine in this module are critical. They are not optional tuning parameters — they are the switches that enable tool calling at the serving layer.
+
 == Access the Cluster
 
 Open the OpenShift Console using the link in the right panel, or navigate to:
@@ -133,6 +145,13 @@ echo "Model Name: $\{MODEL_NAME\}"
 
 The MaaS endpoint serves {maas_model} with tool calling support. No deployment needed.
 
+=== When to Choose Each Option
+
+* *On-cluster* — full control over the model, flags, and resources. Choose this when you need to customize the serving configuration, run in an air-gapped environment, or are evaluating different models.
+* *MaaS* — no deployment, no resource management. Choose this when you want to skip infrastructure setup and focus on building the tool calling application. The trade-off is less control over model parameters.
+
+For this lab, either option works. The tool calling protocol is identical regardless of where the model runs.
+
 == Verify the Model
 
 List available models:
@@ -160,6 +179,35 @@ curl -s $\{MODEL_URL\}/chat/completions \
 ----
 
 You should receive a natural language response. This confirms the endpoint is healthy and ready for tool calling in the next module.
+
+=== Verify: Model is Ready for Tool Calling
+
+You should see:
+
+* The `/models` endpoint returns a JSON object with your model name in the `data` array
+* The chat completion returns a `choices` array with a natural language response in `message.content`
+* The response includes a `usage` block with token counts
+
+If the `/models` endpoint returns an empty list or connection error, the model is not deployed or the URL is incorrect. Double-check your `MODEL_URL` variable with `echo ${MODEL_URL}`.
+
+=== Troubleshooting
+
+[cols="1,2",options="header"]
+|===
+|Symptom |Resolution
+
+|`oc apply -k` fails with "no matches for kind"
+|The KServe CRDs may not be installed. Check with `oc api-resources \| grep serving.kserve.io`.
+
+|Pod stuck in `Pending` or `ContainerCreating`
+|The node may not have enough CPU/memory. Check events: `oc describe pod -n {project_name}`.
+
+|`curl` to `/models` returns connection refused
+|The route may not exist yet. Check with `oc get route -n {project_name}`. For MaaS, verify the URL is correct.
+
+|Model responds with text instead of tool calls (in later modules)
+|The tool calling flags may not be set. Verify the vLLM pod args include `--enable-auto-tool-choice` and the correct `--tool-call-parser`.
+|===
 
 == Checkpoint
 
