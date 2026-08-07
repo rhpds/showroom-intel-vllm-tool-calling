@@ -98,22 +98,16 @@ Each module builds on the previous one. Work through them in order. By the end y
 
 When you are ready, proceed to xref:01-tool-calling-fundamentals.adoc[Module 1: Tool Calling Fundamentals] to learn what tool calling is and why it matters.
 
-== Intel Hardware
+== Powered by Intel
 
-This lab runs on **Intel Xeon** processors via the Red Hat Demo Platform.
+AI inference in this lab runs on **Intel** hardware via the Red Hat Demo Platform.
 
 [cols="1,2",options="header"]
 |===
-|Component |Intel Hardware
+|Component |Details
 
-|**LLM Inference (vLLM)**
-|Granite 3.2-8B with tool calling on Intel Xeon CPU
-
-|**Tool Calling Parser**
-|Chat template processing on Intel Xeon
-
-|**Infrastructure**
-|Red Hat OpenShift on Intel Xeon worker nodes
+|**LLM Inference**
+|{maas_model} on Intel via Model-as-a-Service
 |===
 
 TIP: This lab is part of the Red Hat + Intel AI Inference Partnership.
