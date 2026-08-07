@@ -1,0 +1,19 @@
+= Intel AI Quickstart: LLM Tool Calling on Intel
+
+Deploy vLLM with structured tool calling and build function-calling AI agents on OpenShift, powered by Intel.
+Teach an LLM to invoke external tools and APIs using structured function calling -- all running on Intel Xeon processors.
+
+== What You Will Learn
+
+* Deploy vLLM for serving LLMs with tool-calling support
+* Define tool schemas and wire them to external functions
+* Build an AI agent that reasons about when and how to call tools
+* Test structured function-calling flows end to end
+
+== Hardware
+
+All inference runs on **Intel Xeon** processors. No GPU required. Powered by Intel.
+
+== Duration
+
+60 minutes (hands-on workshop)

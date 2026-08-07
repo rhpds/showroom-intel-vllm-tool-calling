@@ -1,0 +1,10 @@
+---
+__meta__:
+  deployer:
+    scm_ref: main
+  sandboxes:
+  - cloud_selector:
+      cloud: cnv-dedicated-shared
+      purpose: dev
+      lab: ai-lab-xeon6-inference
+    kind: OcpSandbox

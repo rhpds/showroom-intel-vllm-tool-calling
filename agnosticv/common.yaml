@@ -1,0 +1,186 @@
+---
+# -------------------------------------------------------------------
+# --- Catalog Item: Intel AI Quickstart vLLM Tool Calling Tenant
+# --- Per-tenant provisioning for the vLLM Tool Calling Quickstart.
+# --- Deploys onto a shared base cluster via the OpenShift Sandbox API.
+# --- Uses quickstart_deploy_via_make to deploy the application.
+# -------------------------------------------------------------------
+
+#include /includes/agd-v2-mapping.yaml
+#include /includes/catalog-icon-openshift.yaml
+#include /includes/terms-of-service.yaml
+#include /includes/sandbox-api.yaml
+
+#include /includes/parameters/purpose.yaml
+#include /includes/access-restriction-quickstarts-ai.yaml
+#include /includes/secrets/litemaas-master_api.yaml
+
+# -------------------------------------------------------------------
+# Mandatory Variables
+# -------------------------------------------------------------------
+config: namespace
+cloud_provider: none
+
+# ===================================================================
+# Additional Collections & roles to be installed for this config
+# ===================================================================
+tag: main
+requirements_content:
+  collections:
+  - name: https://github.com/agnosticd/namespaced_workloads.git
+    type: git
+    version: '{{ tag }}'
+  - name: https://github.com/rhpds/rhpds.litellm_virtual_keys.git
+    type: git
+    version: '{{ tag }}'
+  - name: https://github.com/agnosticd/ai_quickstarts.git
+    type: git
+    version: '{{ tag }}'
+  - name: https://github.com/agnosticd/showroom.git
+    type: git
+    version: v1.6.8
+
+# ===================================================================
+# List of workloads to be deployed
+# ===================================================================
+workloads:
+  - agnosticd.namespaced_workloads.ocp4_workload_tenant_keycloak_user
+  - agnosticd.namespaced_workloads.ocp4_workload_tenant_namespace
+  - rhpds.litellm_virtual_keys.ocp4_workload_litellm_virtual_keys
+  - agnosticd.ai_quickstarts.quickstart_deploy_via_make
+  - agnosticd.showroom.ocp4_workload_ocp_console_embed
+  - agnosticd.showroom.ocp4_workload_showroom
+
+# ===================================================================
+# Common
+# ===================================================================
+common_password: '{{ lookup(''password'', output_dir ~ ''/common_password'', length=12,
+  chars=[''ascii_letters'', ''digits'']) }}'
+
+# ===================================================================
+# Workload: ocp4_workload_tenant_keycloak_user
+# ===================================================================
+ocp4_workload_tenant_keycloak_username: user-{{ guid }}
+ocp4_workload_tenant_keycloak_user_password: '{{ common_password }}'
+ocp4_workload_tenant_keycloak_user_keycloak_namespace: keycloak
+ocp4_workload_tenant_keycloak_user_keycloak_realm: sso
+
+# ===================================================================
+# Workload: ocp4_workload_tenant_namespace
+# ===================================================================
+ocp4_workload_tenant_namespace_username: user-{{ guid }}
+ocp4_workload_tenant_namespace_use_cluster_quota: true
+ocp4_workload_tenant_namespace_suffixes:
+- suffix: intel-vllm-tool-calling
+
+ocp4_workload_tenant_namespace_default_quota:
+  limits.cpu: '16'
+  requests.cpu: '8'
+  limits.memory: 32Gi
+  requests.memory: 16Gi
+  requests.storage: 20Gi
+
+ocp4_workload_tenant_namespace_default_limit_range:
+  default:
+    cpu: '2'
+    memory: 4Gi
+  defaultRequest:
+    cpu: 100m
+    memory: 256Mi
+
+# -------------------------------------------------------------------
+# Workload: ocp4_workload_litellm_virtual_keys
+# -------------------------------------------------------------------
+ocp4_workload_litellm_virtual_keys_duration: 7d
+ocp4_workload_litellm_virtual_keys_models:
+- qwen3-14b
+
+ai_model_requirements:
+  models:
+  - name: qwen3-14b
+    purpose: Inference for tool calling demo
+    access_method: litemaas
+    vertex_ai_model_id: qwen3-14b
+    estimated_input_tokens_per_request: 3000
+    estimated_output_tokens_per_request: 1500
+    estimated_requests_per_session: 25
+    estimated_session_duration_hours: 4
+    max_concurrent_users: 25
+    expected_total_users: 100
+
+# -------------------------------------------------------------------
+# Workload: quickstart_deploy_via_make
+# -------------------------------------------------------------------
+quickstart_deploy_via_make_repo_url: https://github.com/rh-ai-quickstart/vllm-tool-calling
+quickstart_deploy_via_make_scm_ref: main
+quickstart_deploy_via_make_directory: vllm-tool-calling
+quickstart_deploy_via_make_params:
+  NAMESPACE: user-{{ guid }}-intel-vllm-tool-calling
+quickstart_deploy_via_make_uninstall_params:
+  NAMESPACE: user-{{ guid }}-intel-vllm-tool-calling
+
+requester_email: rhdp-{{ guid }}@demo.redhat.com
+catalog_item_name: ai-quickstarts.intel-ai-qs-vllm-tool-calling-tenant.event
+
+# -------------------------------------------------------------------
+  - agnosticd.showroom.ocp4_workload_ocp_console_embed
+# Workload: ocp4_workload_showroom
+# -------------------------------------------------------------------
+openshift_api_url: '{{ sandbox_openshift_api_url }}'
+openshift_cluster_admin_token: '{{ cluster_admin_agnosticd_sa_token }}'
+ocp4_workload_showroom_passthrough_user_data: true
+ocp4_workload_showroom_content_git_repo: https://github.com/rh-ai-quickstart/showroom-intel-vllm-tool-calling
+ocp4_workload_showroom_user_data:
+  maas_endpoint: '{{ LITELLM_API_BASE | default("https://litemaas.apps.ocp-rac-maas.rs-dfw3.infra.demo.redhat.com") }}'
+  maas_model: qwen3-14b
+
+# -------------------------------------------------------------------
+# Babylon meta variables
+# -------------------------------------------------------------------
+__meta__:
+  access_control:
+    allow_groups:
+    - rhpds-devs-quickstart-ai
+  asset_uuid: 841f2fec-be86-4459-acaa-7a91fe0c6938
+  owners:
+    maintainer:
+    - name: Jonathan Kershaw
+      email: jkershaw@redhat.com
+  sandbox_api:
+    actions:
+      destroy:
+        catch_all: false
+  catalog:
+    display_name: 'Intel AI Quickstart: LLM Tool Calling on Intel'
+    category: Labs
+    namespace: babylon-catalog-{{ stage | default('?') }}
+    keywords:
+    - openshift
+    - quickstart
+    - ai
+    - intel
+    - vllm
+    - tool-calling
+    - function-calling
+    labels:
+      Provider: RHDP
+    reportingLabels:
+      primaryBU: Hybrid_Platforms
+    parameters: []
+  deployer:
+    scm_url: https://github.com/agnosticd/agnosticd-v2
+    scm_ref: main
+    execution_environment:
+      image: quay.io/agnosticd/ee-multicloud:chained-2026-07-07
+      pull: missing
+    actions:
+      destroy:
+        disable: false
+      start:
+        disable: false
+      status:
+        disable: true
+      stop:
+        disable: false
+      update:
+        disable: true
