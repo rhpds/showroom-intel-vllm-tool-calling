@@ -12,7 +12,7 @@ The challenge: most tool calling tutorials assume expensive GPU hardware. In thi
 
 By the end of this lab you will have constructed:
 
-* A *vLLM model server* with tool calling enabled, serving Granite 3.2-8B or Qwen3-14B
+* A connection to *{maas_model}* via Model as a Service -- tool calling enabled, running on Intel Xeon 6 via MaaS
 * The complete *6-step tool calling protocol*, executed by hand so you understand every piece
 * An *automated dispatch loop* in Python that handles the tool call lifecycle
 * A *multi-tool application* where the model chains multiple function calls to answer complex questions
@@ -61,11 +61,11 @@ The model never executes code. It produces structured JSON requests. Your applic
 |===
 | Component | Purpose
 
-| *vLLM with Tool Calling*
-| Serves a tool-calling-capable model with `--enable-auto-tool-choice`. Exposes an OpenAI-compatible `/v1/chat/completions` endpoint.
+| *Model as a Service (MaaS)*
+| Pre-hosted {maas_model} on Intel Xeon 6 with `--enable-auto-tool-choice`. Exposes an OpenAI-compatible `/v1/chat/completions` endpoint. $0 per token.
 
 | *OpenShift AI*
-| Provides the serving runtime, resource management, and networking.
+| Provides the platform, namespace isolation, and console access.
 
 | *Your Terminal*
 | Where you build `curl` commands and Python scripts that interact with the model API.
@@ -80,7 +80,7 @@ This lab takes approximately *90 minutes* to complete:
 | Module | Topic | Time
 
 | 1 | Tool Calling Fundamentals | 10 min
-| 2 | Serve a Model with Tool Calling | 15 min
+| 2 | Connect to a Tool-Calling Model | 15 min
 | 3 | Anatomy of a Tool Call | 20 min
 | 4 | Build the Tool Calling Loop | 20 min
 | 5 | Build a Multi-Tool Application | 15 min

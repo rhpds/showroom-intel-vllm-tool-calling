@@ -1,22 +1,42 @@
-= Module 2: Serve a Model with Tool Calling
+= Module 2: Connect to a Tool-Calling Model
 
 _Estimated time: 15 minutes_
 
-In this module you will access the OpenShift cluster, examine the critical vLLM flags that enable tool calling, deploy the model server, and verify it is ready. You will understand *how* the serving layer enables tool calling before you use it.
+In this module you will access the OpenShift cluster, learn how vLLM enables tool calling at the serving layer, connect to the pre-hosted model via Model as a Service (MaaS), and verify it is ready. You will understand *how* the serving layer enables tool calling before you use it.
 
-== Know: Why the Serving Layer Matters for Tool Calling
+== See: Why the Serving Layer Matters for Tool Calling
 
-Tool calling is not just a prompt engineering trick — it requires coordination between the model and the serving layer. Three things must align:
+Tool calling is not just a prompt engineering trick -- it requires coordination between the model and the serving layer. Three things must align:
 
-* *Model training* — the model must have been trained on tool calling examples so it knows how to produce structured `tool_calls` JSON instead of plain text
-* *Server configuration* — the vLLM server must be told to parse tool call output from the model's specific format (Granite, Llama, and Hermes each format tool calls differently)
-* *Chat template* — a Jinja2 template wraps tool definitions in special tokens so the model recognizes them as available functions
+* *Model training* -- the model must have been trained on tool calling examples so it knows how to produce structured `tool_calls` JSON instead of plain text
+* *Server configuration* -- the vLLM server must be told to parse tool call output from the model's specific format (Granite, Llama, and Hermes each format tool calls differently)
+* *Chat template* -- a Jinja2 template wraps tool definitions in special tokens so the model recognizes them as available functions
 
-If any of these three pieces is missing, tool calling silently fails — the model responds with text instead of structured tool calls, and you have no error message to debug.
+If any of these three pieces is missing, tool calling silently fails -- the model responds with text instead of structured tool calls, and you have no error message to debug.
 
-This is why the three vLLM flags you will examine in this module are critical. They are not optional tuning parameters — they are the switches that enable tool calling at the serving layer.
+== Learn: The Critical vLLM Flags
 
-== Access the Cluster
+When serving a tool-calling model with vLLM, three flags enable the capability:
+
+[cols="2,3"]
+|===
+| Flag | Purpose
+
+| `--enable-auto-tool-choice`
+| Lets the model autonomously decide when to call a tool versus responding with text. Without this flag, the model ignores tool definitions entirely.
+
+| `--tool-call-parser granite`
+| Tells vLLM how to parse the model's tool call output. Different model families format tool calls differently. Granite uses a specific token format; Llama uses `llama3_json`.
+
+| `--chat-template`
+| Points to a Jinja2 template that formats tool definitions for the model. The template wraps tools in role markers like `<\|start_of_role\|>available_tools<\|end_of_role\|>` so the model recognizes them.
+|===
+
+The key insight: *tool calling is a model capability enabled by the serving layer*. The model must be trained for tool calling, and the server must be configured to parse its output format. Neither alone is sufficient.
+
+In this lab, the Red Hat Demo Platform provides a pre-hosted model via MaaS (Model as a Service). The vLLM server is already running on Intel Xeon 6 hardware with these flags enabled -- so you can focus on building the tool calling application rather than managing infrastructure.
+
+== Do: Access the Cluster
 
 Open the OpenShift Console using the link in the right panel, or navigate to:
 
@@ -41,19 +61,21 @@ Verify your project exists:
 oc project {project_name}
 ----
 
-== Set Up Environment Variables
+== Do: Set Up Environment Variables
 
 Set the variables that the remaining modules will use:
 
 [source,bash,role="execute",subs="attributes+"]
 ----
 export PROJECT={project_name}
-export MAAS_URL={maas_api_url}
-export MAAS_MODEL={maas_model}
-echo "Project: $\{PROJECT\}"
-echo "MaaS URL: $\{MAAS_URL\}"
-echo "MaaS Model: $\{MAAS_MODEL\}"
+export MODEL_URL={maas_api_url}
+export MODEL_NAME={maas_model}
+echo "Project: ${PROJECT}"
+echo "Model URL: ${MODEL_URL}"
+echo "Model Name: ${MODEL_NAME}"
 ----
+
+The MaaS endpoint serves {maas_model} on Intel Xeon 6 hardware with tool calling support already enabled. All inference in this lab runs through this endpoint -- $0 per token, no GPU required.
 
 Install the Python OpenAI client library (you will need it in later modules):
 
@@ -62,103 +84,13 @@ Install the Python OpenAI client library (you will need it in later modules):
 pip install --quiet openai
 ----
 
-== Clone the Quickstart Repository
-
-Clone the repository that contains the Kustomize overlays:
-
-[source,bash,role="execute",subs="attributes+"]
-----
-cd ~ && git clone {quickstart_repo}
-----
-
-Examine the overlay structure:
-
-[source,bash,role="execute"]
-----
-ls ~/vllm-tool-calling/
-----
-
-Each model has its own directory with device-specific overlays (CPU or GPU). The overlays configure the model name, resource limits, and the flags that activate tool calling.
-
-== Understand the Tool Calling Flags
-
-Before you deploy, examine the critical vLLM arguments that enable tool calling. These are set in the Kustomize overlay and passed to the vLLM server at startup:
-
-[cols="2,3"]
-|===
-| Flag | Purpose
-
-| `--enable-auto-tool-choice`
-| Lets the model autonomously decide when to call a tool versus responding with text. Without this flag, the model ignores tool definitions entirely.
-
-| `--tool-call-parser granite`
-| Tells vLLM how to parse the model's tool call output. Different model families format tool calls differently. Granite uses a specific token format; Llama uses `llama3_json`.
-
-| `--chat-template`
-| Points to a Jinja2 template that formats tool definitions for the model. The template wraps tools in role markers like `<\|start_of_role\|>available_tools<\|end_of_role\|>` so the model recognizes them.
-|===
-
-The key insight: *tool calling is a model capability enabled by the serving layer*. The model must be trained for tool calling, and the server must be configured to parse its output format. Neither alone is sufficient.
-
-== Deploy the Model
-
-You have two options: deploy Granite 3.2-8B on-cluster, or connect to a pre-hosted model via MaaS.
-
-=== Option A: Deploy Granite 3.2-8B On-Cluster
-
-Apply the Kustomize overlay for Granite 3.2-8B on CPU:
-
-[source,bash,role="execute",subs="attributes+"]
-----
-oc apply -n {project_name} -k ~/vllm-tool-calling/granite-3.2-8b/cpu
-----
-
-Monitor until the pod is running:
-
-[source,bash,role="execute",subs="attributes+"]
-----
-oc get pods -n {project_name} -w
-----
-
-Press `Ctrl+C` once the vLLM pod reaches `Running` status. The model download may take 3-5 minutes.
-
-Set the model endpoint:
-
-[source,bash,role="execute",subs="attributes+"]
-----
-export MODEL_URL=$(oc get route vllm-tool-calling -n {project_name} -o jsonpath='https://\{.spec.host\}/v1')
-export MODEL_NAME="granite-3.2-8b"
-echo "Model URL: $\{MODEL_URL\}"
-----
-
-=== Option B: Use Model as a Service (MaaS)
-
-If you prefer to skip on-cluster deployment, use the pre-hosted endpoint:
-
-[source,bash,role="execute",subs="attributes+"]
-----
-export MODEL_URL={maas_api_url}
-export MODEL_NAME={maas_model}
-echo "Model URL: $\{MODEL_URL\}"
-echo "Model Name: $\{MODEL_NAME\}"
-----
-
-The MaaS endpoint serves {maas_model} with tool calling support. No deployment needed.
-
-=== When to Choose Each Option
-
-* *On-cluster* — full control over the model, flags, and resources. Choose this when you need to customize the serving configuration, run in an air-gapped environment, or are evaluating different models.
-* *MaaS* — no deployment, no resource management. Choose this when you want to skip infrastructure setup and focus on building the tool calling application. The trade-off is less control over model parameters.
-
-For this lab, either option works. The tool calling protocol is identical regardless of where the model runs.
-
-== Verify the Model
+== Do: Verify the Model
 
 List available models:
 
 [source,bash,role="execute"]
 ----
-curl -s $\{MODEL_URL\}/models | python3 -m json.tool
+curl -s ${MODEL_URL}/models | python3 -m json.tool
 ----
 
 You should see your model listed in the JSON response.
@@ -167,10 +99,10 @@ Send a basic chat completion (no tools) to confirm the model is healthy:
 
 [source,bash,role="execute"]
 ----
-curl -s $\{MODEL_URL\}/chat/completions \
+curl -s ${MODEL_URL}/chat/completions \
   -H "Content-Type: application/json" \
   -d '{
-    "model": "'"$\{MODEL_NAME\}"'",
+    "model": "'"${MODEL_NAME}"'",
     "messages": [
       {"role": "user", "content": "What is function calling in AI? Answer in two sentences."}
     ],
@@ -188,26 +120,7 @@ You should see:
 * The chat completion returns a `choices` array with a natural language response in `message.content`
 * The response includes a `usage` block with token counts
 
-If the `/models` endpoint returns an empty list or connection error, the model is not deployed or the URL is incorrect. Double-check your `MODEL_URL` variable with `echo ${MODEL_URL}`.
-
-=== Troubleshooting
-
-[cols="1,2",options="header"]
-|===
-|Symptom |Resolution
-
-|`oc apply -k` fails with "no matches for kind"
-|The KServe CRDs may not be installed. Check with `oc api-resources \| grep serving.kserve.io`.
-
-|Pod stuck in `Pending` or `ContainerCreating`
-|The node may not have enough CPU/memory. Check events: `oc describe pod -n {project_name}`.
-
-|`curl` to `/models` returns connection refused
-|The route may not exist yet. Check with `oc get route -n {project_name}`. For MaaS, verify the URL is correct.
-
-|Model responds with text instead of tool calls (in later modules)
-|The tool calling flags may not be set. Verify the vLLM pod args include `--enable-auto-tool-choice` and the correct `--tool-call-parser`.
-|===
+If the `/models` endpoint returns an empty list or connection error, double-check your `MODEL_URL` variable with `echo ${MODEL_URL}`.
 
 == Checkpoint
 
@@ -215,7 +128,7 @@ At this point you have:
 
 * [x] Logged into the OpenShift cluster and set up environment variables
 * [x] Understood the three critical vLLM flags that enable tool calling
-* [x] Deployed the model server (on-cluster or MaaS)
+* [x] Connected to the MaaS-hosted model endpoint
 * [x] Verified the model is responding to basic requests
 
 Proceed to xref:03-anatomy-of-tool-call.adoc[Module 3: Anatomy of a Tool Call].
