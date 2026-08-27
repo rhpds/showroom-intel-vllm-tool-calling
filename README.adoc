@@ -1,6 +1,6 @@
 = Enable AI Tool Calling on OpenShift -- Lab
 
-This repository contains a guided, hands-on lab for the https://github.com/rh-ai-quickstart/vllm-tool-calling[vllm-tool-calling] quickstart.
+This repository contains a guided, hands-on lab for the https://github.com/rhpds/vllm-tool-calling[vllm-tool-calling] quickstart.
 
 == Running locally
 
@@ -17,5 +17,5 @@ open www/index.html
 
 == Related
 
-* https://github.com/rh-ai-quickstart/vllm-tool-calling[Quickstart Repository]
+* https://github.com/rhpds/vllm-tool-calling[Quickstart Repository]
 * https://docs.redhat.com/en/learn/ai-quickstarts[AI Quickstart Catalog]

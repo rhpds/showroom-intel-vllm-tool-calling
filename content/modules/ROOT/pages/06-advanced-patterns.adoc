@@ -13,6 +13,7 @@ Test parallel tool calling:
 [source,bash,role="execute"]
 ----
 curl -s $\{MODEL_URL\}/chat/completions \
+  -H "Authorization: Bearer $\{MODEL_API_KEY\}" \
   -H "Content-Type: application/json" \
   -d '{
     "model": "'"$\{MODEL_NAME\}"'",
@@ -68,6 +69,7 @@ Test forced tool choice:
 [source,bash,role="execute"]
 ----
 curl -s $\{MODEL_URL\}/chat/completions \
+  -H "Authorization: Bearer $\{MODEL_API_KEY\}" \
   -H "Content-Type: application/json" \
   -d '{
     "model": "'"$\{MODEL_NAME\}"'",
@@ -127,7 +129,7 @@ cat > ~/validate_args.py << 'PYEOF'
 import json, os
 from openai import OpenAI
 
-client = OpenAI(base_url=os.environ["MODEL_URL"], api_key="not-needed")
+client = OpenAI(base_url=os.environ["MODEL_URL"], api_key=os.environ["MODEL_API_KEY"])
 MODEL = os.environ["MODEL_NAME"]
 
 tools = [{"type": "function", "function": {
@@ -176,7 +178,7 @@ cat > ~/guardrails.py << 'PYEOF'
 import json, os, time
 from openai import OpenAI
 
-client = OpenAI(base_url=os.environ["MODEL_URL"], api_key="not-needed")
+client = OpenAI(base_url=os.environ["MODEL_URL"], api_key=os.environ["MODEL_API_KEY"])
 MODEL = os.environ["MODEL_NAME"]
 
 tools = [{"type": "function", "function": {

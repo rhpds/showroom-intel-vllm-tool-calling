@@ -1,7 +1,7 @@
 ---
 site:
   title: "Enable AI Tool Calling on OpenShift"
-  url: https://github.com/rh-ai-quickstart/showroom-vllm-tool-calling
+  url: https://github.com/rhpds/showroom-intel-vllm-tool-calling
   start_page: modules::index.adoc
 
 content:

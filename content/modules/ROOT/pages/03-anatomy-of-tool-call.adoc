@@ -75,6 +75,7 @@ Send the request to the model endpoint:
 [source,bash,role="execute"]
 ----
 curl -s $\{MODEL_URL\}/chat/completions \
+  -H "Authorization: Bearer $\{MODEL_API_KEY\}" \
   -H "Content-Type: application/json" \
   -d @~/tool_request.json > ~/tool_response.json
 cat ~/tool_response.json | python3 -m json.tool
@@ -156,6 +157,7 @@ print(json.dumps(r['choices'][0]['message']))
 ")
 
 curl -s $\{MODEL_URL\}/chat/completions \
+  -H "Authorization: Bearer $\{MODEL_API_KEY\}" \
   -H "Content-Type: application/json" \
   -d '{
     "model": "'"$\{MODEL_NAME\}"'",
@@ -212,6 +214,7 @@ Send a question that does not require a tool. The model should respond with text
 [source,bash,role="execute"]
 ----
 curl -s $\{MODEL_URL\}/chat/completions \
+  -H "Authorization: Bearer $\{MODEL_API_KEY\}" \
   -H "Content-Type: application/json" \
   -d '{
     "model": "'"$\{MODEL_NAME\}"'",

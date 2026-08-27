@@ -111,7 +111,7 @@ ai_model_requirements:
 # -------------------------------------------------------------------
 # Workload: quickstart_deploy_via_make
 # -------------------------------------------------------------------
-quickstart_deploy_via_make_repo_url: https://github.com/rh-ai-quickstart/vllm-tool-calling
+quickstart_deploy_via_make_repo_url: https://github.com/rhpds/vllm-tool-calling
 quickstart_deploy_via_make_scm_ref: main
 quickstart_deploy_via_make_directory: vllm-tool-calling
 quickstart_deploy_via_make_params:
@@ -129,7 +129,7 @@ catalog_item_name: ai-quickstarts.intel-ai-qs-vllm-tool-calling-tenant.event
 openshift_api_url: '{{ sandbox_openshift_api_url }}'
 openshift_cluster_admin_token: '{{ cluster_admin_agnosticd_sa_token }}'
 ocp4_workload_showroom_passthrough_user_data: true
-ocp4_workload_showroom_content_git_repo: https://github.com/rh-ai-quickstart/showroom-intel-vllm-tool-calling
+ocp4_workload_showroom_content_git_repo: https://github.com/rhpds/showroom-intel-vllm-tool-calling
 ocp4_workload_showroom_user_data:
   maas_endpoint: '{{ LITELLM_API_BASE | default("https://litemaas.apps.ocp-rac-maas.rs-dfw3.infra.demo.redhat.com") }}'
   maas_model: qwen3-14b

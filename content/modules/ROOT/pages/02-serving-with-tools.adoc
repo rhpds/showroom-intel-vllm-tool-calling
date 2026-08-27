@@ -70,9 +70,10 @@ Set the variables that the remaining modules will use:
 export PROJECT={project_name}
 export MODEL_URL={maas_api_url}
 export MODEL_NAME={maas_model}
-echo "Project: ${PROJECT}"
-echo "Model URL: ${MODEL_URL}"
-echo "Model Name: ${MODEL_NAME}"
+export MODEL_API_KEY={maas_api_key}
+echo "Project: $\{PROJECT\}"
+echo "Model URL: $\{MODEL_URL\}"
+echo "Model Name: $\{MODEL_NAME\}"
 ----
 
 The MaaS endpoint serves {maas_model} on Intel Xeon 6 hardware with tool calling support already enabled. All inference in this lab runs through this endpoint -- $0 per token, no GPU required.
@@ -90,7 +91,8 @@ List available models:
 
 [source,bash,role="execute"]
 ----
-curl -s ${MODEL_URL}/models | python3 -m json.tool
+curl -s $\{MODEL_URL\}/models \
+  -H "Authorization: Bearer $\{MODEL_API_KEY\}" | python3 -m json.tool
 ----
 
 You should see your model listed in the JSON response.
@@ -99,10 +101,11 @@ Send a basic chat completion (no tools) to confirm the model is healthy:
 
 [source,bash,role="execute"]
 ----
-curl -s ${MODEL_URL}/chat/completions \
+curl -s $\{MODEL_URL\}/chat/completions \
+  -H "Authorization: Bearer $\{MODEL_API_KEY\}" \
   -H "Content-Type: application/json" \
   -d '{
-    "model": "'"${MODEL_NAME}"'",
+    "model": "'"$\{MODEL_NAME\}"'",
     "messages": [
       {"role": "user", "content": "What is function calling in AI? Answer in two sentences."}
     ],
@@ -120,7 +123,7 @@ You should see:
 * The chat completion returns a `choices` array with a natural language response in `message.content`
 * The response includes a `usage` block with token counts
 
-If the `/models` endpoint returns an empty list or connection error, double-check your `MODEL_URL` variable with `echo ${MODEL_URL}`.
+If the `/models` endpoint returns an empty list or connection error, double-check your `MODEL_URL` variable with `echo $\{MODEL_URL\}`.
 
 == Checkpoint
 

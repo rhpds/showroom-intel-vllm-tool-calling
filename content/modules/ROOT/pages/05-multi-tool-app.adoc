@@ -30,7 +30,7 @@ import json
 import os
 from openai import OpenAI
 
-client = OpenAI(base_url=os.environ["MODEL_URL"], api_key="not-needed")
+client = OpenAI(base_url=os.environ["MODEL_URL"], api_key=os.environ["MODEL_API_KEY"])
 MODEL = os.environ["MODEL_NAME"]
 
 # --- Three Tool Definitions ---
@@ -184,7 +184,7 @@ cat > ~/error_test.py << 'PYEOF'
 import json, os
 from openai import OpenAI
 
-client = OpenAI(base_url=os.environ["MODEL_URL"], api_key="not-needed")
+client = OpenAI(base_url=os.environ["MODEL_URL"], api_key=os.environ["MODEL_API_KEY"])
 MODEL = os.environ["MODEL_NAME"]
 
 tools = [{"type": "function", "function": {
@@ -236,7 +236,7 @@ import json, os
 from datetime import datetime
 from openai import OpenAI
 
-client = OpenAI(base_url=os.environ["MODEL_URL"], api_key="not-needed")
+client = OpenAI(base_url=os.environ["MODEL_URL"], api_key=os.environ["MODEL_API_KEY"])
 MODEL = os.environ["MODEL_NAME"]
 
 tools = [

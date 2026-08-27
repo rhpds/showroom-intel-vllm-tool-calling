@@ -101,7 +101,7 @@ oc delete project {project_name}
 == Links and Resources
 
 * *Quickstart Repository:* {quickstart_repo}
-* *Red Hat AI Quickstarts:* https://github.com/rh-ai-quickstart
+* *RHPDS Quickstarts:* https://github.com/rhpds
 * *OpenShift AI Documentation:* https://docs.redhat.com/en/documentation/red_hat_openshift_ai_self-managed
 * *OpenAI Function Calling Docs:* https://platform.openai.com/docs/guides/function-calling
 
