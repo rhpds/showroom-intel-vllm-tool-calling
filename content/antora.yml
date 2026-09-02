@@ -14,7 +14,7 @@ asciidoc:
     openshift_console_url: 'https://console-openshift-console.apps.cluster-%GUID%.%GUID%.sandbox.opentlc.com'
     openshift_cluster_ingress_domain: 'apps.cluster-%GUID%.%GUID%.sandbox.opentlc.com'
     rhoai_dashboard_url: 'https://rhods-dashboard-redhat-ods-applications.apps.cluster-%GUID%.%GUID%.sandbox.opentlc.com'
-    project_name: 'vllm-tool-calling'
+    project_name: 'user-%GUID%-vllm-tool-calling'
     quickstart_repo: 'https://github.com/rh-ai-quickstart/vllm-tool-calling.git'
     maas_api_url: '%maas_endpoint%'
     maas_model: 'qwen3-14b'
