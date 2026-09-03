@@ -7,16 +7,15 @@ nav:
 
 asciidoc:
   attributes:
-    user: user1
-    password: openshift
-    guid: '%GUID%'
-    openshift_api_url: 'https://api.cluster-%GUID%.%GUID%.sandbox.opentlc.com:6443'
-    openshift_console_url: 'https://console-openshift-console.apps.cluster-%GUID%.%GUID%.sandbox.opentlc.com'
-    openshift_cluster_ingress_domain: 'apps.cluster-%GUID%.%GUID%.sandbox.opentlc.com'
-    rhoai_dashboard_url: 'https://rhods-dashboard-redhat-ods-applications.apps.cluster-%GUID%.%GUID%.sandbox.opentlc.com'
-    project_name: 'vllm-tool-calling'
+    user: '%user%'
+    password: '%password%'
+    guid: '%guid%'
+    openshift_api_url: '%openshift_api_url%'
+    openshift_console_url: '%openshift_console_url%'
+    openshift_cluster_ingress_domain: '%openshift_cluster_ingress_domain%'
+    project_name: 'user-%guid%-vllm-tool-calling'
     quickstart_repo: 'https://github.com/rhpds/vllm-tool-calling.git'
-    maas_api_url: '%maas_endpoint%'
+    maas_api_url: '%maas_endpoint%/v1'
     maas_api_key: '%maas_api_key%'
-    maas_model: 'qwen3-14b'
+    maas_model: '%maas_model%'
     intel_platform: 'Intel Xeon'
