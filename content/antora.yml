@@ -15,7 +15,7 @@ asciidoc:
     openshift_cluster_ingress_domain: '%openshift_cluster_ingress_domain%'
     project_name: 'user-$GUID-vllm-tool-calling'
     quickstart_repo: 'https://github.com/rhpds/vllm-tool-calling.git'
-    maas_api_url: '%maas_endpoint%/v1'
+    maas_api_url: '%litellm_api_base_url%'
     maas_api_key: '%maas_api_key%'
     maas_model: '%maas_model%'
     intel_platform: 'Intel Xeon'
