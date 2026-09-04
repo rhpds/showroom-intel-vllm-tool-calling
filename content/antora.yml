@@ -13,7 +13,7 @@ asciidoc:
     openshift_api_url: '%openshift_api_url%'
     openshift_console_url: '%openshift_console_url%'
     openshift_cluster_ingress_domain: '%openshift_cluster_ingress_domain%'
-    project_name: 'user-%guid%-vllm-tool-calling'
+    project_name: 'user-$GUID-vllm-tool-calling'
     quickstart_repo: 'https://github.com/rhpds/vllm-tool-calling.git'
     maas_api_url: '%maas_endpoint%/v1'
     maas_api_key: '%maas_api_key%'
