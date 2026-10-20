@@ -105,6 +105,11 @@ curl -s $\{MODEL_URL\}/models \
 
 You should see your model listed in the JSON response.
 
+[IMPORTANT]
+====
+A listed model and a successful chat completion do not prove tool calling. Module 3 must return a structured `tool_calls` entry with valid arguments. If the server reports that `--enable-auto-tool-choice` or `--tool-call-parser` is missing, the platform owner must fix the serving configuration or allocate a tested endpoint. Do not treat plain-text tool descriptions as a successful tool call.
+====
+
 Send a basic chat completion (no tools) to confirm the model is healthy:
 
 [source,bash,role="execute"]
