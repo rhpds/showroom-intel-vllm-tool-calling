@@ -69,7 +69,7 @@ Swap the mock functions for actual API calls -- a weather service, a database qu
 
 === Try Different Models
 
-The Kustomize overlays support Granite 3.2-8B, Llama 3.2-1B, and Llama 3.2-3B. Each model has different tool calling accuracy and speed. Try swapping models to compare behavior.
+The standalone overlays include Granite 3.2-8B, Llama 3.2-1B, and Llama 3.2-3B. The verifier found that Llama 3.2-1B deployed but did not produce tool calls. Use a verified tool-capable model; a successful deployment is not a tool-calling acceptance result. In this MaaS lab, model changes also require a matching key allocation from the platform owner.
 
 === Build a Full Agent
 
@@ -91,7 +91,7 @@ Remove the scripts you created:
 rm -rf ~/vllm-tool-calling ~/tool_loop.py ~/multi_tool_app.py ~/error_test.py ~/traced_query.py ~/validate_args.py ~/guardrails.py ~/tool_request.json ~/tool_response.json
 ----
 
-Optionally remove the project:
+Do not delete the RHDP-managed tenant project. The platform owns its lifecycle. Verify your current namespace and remove only learner-created resources. The following optional command is only for a standalone project you created yourself:
 
 [source,bash,role="execute",subs="attributes+"]
 ----
